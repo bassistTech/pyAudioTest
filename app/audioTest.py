@@ -63,7 +63,6 @@ def go_free_run():
 def go_generate():
     pat.globals['generate'] = rb_generate.get()
 
-
 md = ug.MainDialog('pyAudioTest')
 graph = ug.Graph(md, 2, 1)
 cb_db = ug.CheckBox(md, 'dB scale', 0, None)
