@@ -102,7 +102,7 @@ while True:
     if fnext > fmax:
         break
 
-print('sine frequency', sine_frequency)
+print('pyAudioTest sine frequency (Hz) = ', sine_frequency)
 
 '''
 Apply maximum amplitudes to the waveforms, just short of 32k
@@ -163,10 +163,14 @@ def audioCallback(in_data, frame_count, time_info, status):
     else:
         return (zero_block, pyaudio.paContinue)
 
+audio = pyaudio.PyAudio()
+info = audio.get_host_api_info_by_index(0)
+numdevices = info.get('deviceCount')
+print('pyAudioTest list of available audio devices')
+for i in range(0, numdevices):
+    print("Device id ", i, " - ", audio.get_device_info_by_host_api_device_index(0, i).get('name'))
 
-def startAudio():
-    audio = pyaudio.PyAudio()
-
+def startAudio(device_num = 0):
     stream = audio.open(format=pyaudio.paInt16,
                         channels=numChannels,
                         rate=sampleRateHz,
@@ -174,11 +178,13 @@ def startAudio():
                         input=True,
                         frames_per_buffer=blockLength,
                         stream_callback=audioCallback,
+                        output_device_index = device_num,
+                        input_device_index = device_num,
                         start=False)  # delaying start until everything is ready
 
     stream.start_stream()
 
-    return audio, stream
+    return stream
 
 
 def stopAudio(stream):
