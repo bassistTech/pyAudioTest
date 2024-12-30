@@ -170,7 +170,7 @@ print('pyAudioTest list of available audio devices')
 for i in range(0, numdevices):
     print("Device id ", i, " - ", audio.get_device_info_by_host_api_device_index(0, i).get('name'))
 
-def startAudio(device_num = 0):
+def startAudio(input_device = 0, output_device = 0):
     stream = audio.open(format=pyaudio.paInt16,
                         channels=numChannels,
                         rate=sampleRateHz,
@@ -178,8 +178,8 @@ def startAudio(device_num = 0):
                         input=True,
                         frames_per_buffer=blockLength,
                         stream_callback=audioCallback,
-                        output_device_index = device_num,
-                        input_device_index = device_num,
+                        # output_device_index = output_device,
+                        # input_device_index = input_device,
                         start=False)  # delaying start until everything is ready
 
     stream.start_stream()

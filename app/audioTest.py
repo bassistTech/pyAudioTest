@@ -16,7 +16,6 @@ import numpy as np
 
 import pyAudioTest as pat
 import uglyGui as ug
-import json
 
 '''
 Monkey patch... we're among friends
@@ -45,7 +44,7 @@ def plot_linear(data):
 
 def go_single():
     if cb_clear_baseline.get() == 1:
-        pat.globals['baseline'] = pat.globals['baseline']*0
+        pat.globals['baseline'] = baseline*0
         cb_clear_baseline.upd(0)
     pat.waitCycle()
     data = pat.analyzeAudio(stream)
@@ -64,8 +63,6 @@ def go_free_run():
 def go_generate():
     pat.globals['generate'] = rb_generate.get()
 
-config = json.load(open('config.json'))
-print(config)
 md = ug.MainDialog('pyAudioTest')
 graph = ug.Graph(md, 2, 1)
 cb_db = ug.CheckBox(md, 'dB scale', 0, None)
@@ -76,6 +73,6 @@ rb_generate = ug.RadioButtons(md, 'Signal generator', ['Off', 'ToneCluster', 'Si
 b_single = ug.Button(md, 'Single reading', go_single)
 cb_free_run = ug.CheckBox(md, 'Free run', 0, go_free_run)
 
-stream = pat.startAudio(config['device'])
+stream = pat.startAudio()
 md.show()
 pat.stopAudio(stream)
