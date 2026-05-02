@@ -16,6 +16,9 @@ import numpy as np
 
 import pyAudioTest as pat
 import uglyGui as ug
+import config
+import json
+#import os
 
 '''
 Monkey patch... we're among friends
@@ -26,6 +29,11 @@ pat.globals['baseline'] = np.zeros_like(pat.frequencyScale)
 def plot_waveform(data):
     graph.axes[0].clear()
     graph.axes[0].plot(pat.timeScale, data['data'][0])
+    if cb_clipboard.get() == 1:
+        blob = {'timeScale': pat.timeScale.tolist(), 'data': data['data'][0].tolist()}
+        md.clipboard_clear()
+        md.clipboard_append(json.dumps(blob))
+        cb_clipboard.upd(0)
 
 def plot_db(data):
     if cb_set_baseline.get() == 1:
@@ -35,8 +43,14 @@ def plot_db(data):
     graph.axes[1].clear()
     if pat.globals['generate'] != 1:   
         graph.axes[1].semilogx(pat.frequencyScale, data_sub)
+        blob = {'frequencyScale': pat.frequencyScale.tolist(), 'data_sub': data_sub.tolist()}
     if rb_generate.get() == 1:
+        blob = {'frequencyScale': pat.frequencyScale.tolist(), 'dbfft': data['dbfft'][0].tolist()}
         graph.axes[1].semilogx(pat.toneFrequency, data_sub[pat.toneIndex], marker = '.')
+    if cb_clipboard.get() == 1:
+        md.clipboard_clear()
+        md.clipboard_append(json.dumps(blob))
+        cb_clipboard.upd(0)
 
 def plot_linear(data):
     graph.axes[1].clear()
@@ -44,7 +58,7 @@ def plot_linear(data):
 
 def go_single():
     if cb_clear_baseline.get() == 1:
-        pat.globals['baseline'] = baseline*0
+        pat.globals['baseline'] = pat.globals['baseline']*0
         cb_clear_baseline.upd(0)
     pat.waitCycle()
     data = pat.analyzeAudio(stream)
@@ -72,7 +86,9 @@ rb_generate = ug.RadioButtons(md, 'Signal generator', ['Off', 'ToneCluster', 'Si
                               0, False, go_generate)
 b_single = ug.Button(md, 'Single reading', go_single)
 cb_free_run = ug.CheckBox(md, 'Free run', 0, go_free_run)
-
+cb_clipboard = ug.CheckBox(md, 'Copy to clipboard', 0, None)
+input_device = config.input_device
+output_device = config.output_device
 stream = pat.startAudio()
 md.show()
 pat.stopAudio(stream)
